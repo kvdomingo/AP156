@@ -1,0 +1,182 @@
+\documentclass[12pt,a4paper,twoside]{article}
+\input{spp.dat}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\def\rcurs{{\mbox{$\resizebox{.16in}{.08in}{\includegraphics{ScriptR}}$}}}
+\def\rcurs{{\mbox{$\resizebox{.09in}{.08in}{\includegraphics[trim= 1em 0 14em 0,clip]{ScriptR}}$}}}
+\def\brcurs{{\mbox{$\resizebox{.09in}{.08in}{\includegraphics[trim= 1em 0 14em 0,clip]{BoldR}}$}}}
+
+\begin{document}
+
+\title{\TitleFont Investigation of the potentials and electric fields of an arbitrary discrete charge distribution using multipole expansion}
+
+\author[*]{Kenneth V. Domingo\lastauthorsep}
+\affil[ ]{National Institute of Physics, University of the Philippines, Diliman, Quezon City}
+\affil[*]{\corremail{kdomingo@nip.upd.edu.ph}}
+
+\begin{abstract}
+\noindent
+
+
+\keywords{multipole expansion, dipole approximation, quadrupole approximation, electric field, scalar potential.}
+
+\end{abstract}
+
+\maketitle
+\thispagestyle{titlestyle}
+
+\section{Introduction}
+\label{sec:Intro}
+\medskip
+In electrostatics, a multipole expansion is a useful tool in approximating the behavior of electromagnetic potentials and fields at a certain distance from a charge distribution. Multipole expansions are mathematical series that can be truncated in order to approximate a function within a reasonable margin of error \cite{edmonds}. From a large distance away, any localized charge distribution looks like a point charge, and as an observer moves closer, the dipole moment becomes noticeable. Upon closer approach, the quadrupole moment will be felt as well \cite{kinzel}. Higher order terms subsequently become noticeable as one moves even closer to the charge distribution. The terms of the multipole expansion are usually expressed in powers of the distance from the origin; in this case, in powers of the reciprocal of the distance from the origin \cite{griffiths}. For the scope of this paper, we will be dealing only with first three terms: monopole term, the dipole term, and the quadrupole term.
+
+For an arbitrary, discrete charge distribution, the individual charges are assumed to have unit charge and are point-like. Thus, the potential at any point $P$ defined by the position vector $\vec{r}$ is given by
+
+\begin{equation}\label{eq:potential}
+	\Phi(\vec{r}) = \frac{1}{4\pi\epsilon_0} \sum_{i=1}^N \frac{q_i}{|\vec{r} - \vec{r}_i|}
+\end{equation}
+
+where $\epsilon_0$ is the electric permittivity in a vacuum, $q_i$ is the the $i$th charge, and $\vec{r}_i$ is the position vector from the origin to the $i$th charge. The electric field $\vec{E}$ is given by
+
+\begin{equation}\label{eq:efield}
+	\vec{E}(\vec{r}) =  -\nabla \Phi(\vec{r})
+\end{equation}
+
+For $|\vec{r} - \vec{r}_i| \rightarrow \infty$, the potential's multipole expansion up to the quadrupole term is given by \cite{gradshteyn}
+
+\begin{equation}\label{eq:multipole}
+	\Phi(\vec{r}) = \frac{q}{r} + \frac{\vec{p} \cdot \vec{r}}{r^3} + \frac{1}{2r^5}\vec{r}\vec{Q}\vec{r} + \mathcal{O}\left(\frac{1}{r^4}\right)
+\end{equation}
+
+where $q$ is the total charge, $\vec{p}$ is the dipole moment, and $\vec{Q}$ is the quadrupole tensor, given by
+
+\begin{equation}\label{eq:charge}
+	q = \sum_{i=1}^N q_i
+\end{equation}
+
+\begin{equation}\label{eq:dipole}
+	\vec{p} = \sum_{i=1}^N q_i \vec{r}_i
+\end{equation}
+
+\begin{equation}\label{eq:quadrupole}
+	\vec{Q}_{kl} = \sum_{i=1}^N q_i \left[ 3r_i^{(k)}r_i^{(l)} - \delta_{kl}\vec{r}_i^2 \right]
+\end{equation}
+
+where $\delta_{kl}$ is the Kronecker delta, and $\vec{r}_i^{(k)}$ is the $k$th component of $\vec{r}_i$.
+
+\section{Algorithm}
+\label{sec:Algo}
+\medskip
+With Python as the programming language of choice, the random seed was fixed for reproducibility, and the behavior of the electrostatic potentials and fields was investigated by generating an arbitrary, even number of unit point charges, scattered within a $2 \times 2$ meter box on the $x$-$y$ plane, centered at the origin. Floating-point numbers, representing the $x$ and $y$ components of the charges, were randomly drawn from a uniform distribution and inserted into the row vectors of a \texttt{numpy} array, with all the charges' $z$-components set to zero. From these vectors, the first half were assigned to be the positive charges, while the latter half were assigned as the negative charges. Their distribution in the $x$-$y$ plane is shown in Figure \ref{fig:plane}.
+
+The electric potential was calculated for a $4 \times 4$ meter box on the $x$-$y$ plane by dividing it into a $500 \times 500$ grid for $x,y \in [-2,2]$ using \texttt{numpy.meshgrid}, then evaluating the exact $\Phi$ for each point in the meshgrid using \eqref{eq:potential}, and setting units of $4\pi\epsilon_0 = 1$. The potential was then plotted as a 3D surface plot and as its contour projection on the $x$-$y$ plane using the \texttt{Axes3D} object from \texttt{matplotlib\_toolkits} \cite{matplotlib}. To quantify the accuracy of the dipole and quadrupole approximations, the potential was also plotted as a function of $y$ for $x=0.1$ and $z = 0.1$ using the dipole and quadrupole approximations given in \eqref{eq:multipole}, superimposed with the exact potential given in \eqref{eq:potential}.
+
+Finally, the electric field was numerically evaluated using the central difference algorithm, defined in \cite{wilmott}\cite{olver} as
+
+\begin{equation}\label{eq:diff}
+	\partial_x f(x) = \lim_{h\rightarrow 0} \frac{f(x+\frac{1}{2}h) - f(x-\frac{1}{2}h)}{h}
+\end{equation}
+
+where $h$ is the slice width of the function $f$. The result was plotted as a vector field using \texttt{pyplot.streamplot} \cite{christian}. 
+
+\section{Results}
+\label{sec:RnD}
+\medskip
+A total of ten (10) point charges were generated for the purposes of this paper, the first half of which are assigned a positive charge, and the latter half, a negative charge ($|q_i| = 1$). Their distribution on the $x$-$y$ plane is shown in Figure \ref{fig:plane}. On the plane $z = 0.1$, they generate a potential, which is shown as contours of constant $\Phi$ in Figure \ref{fig:contour}, and as ``peaks'' in Figure \ref{fig:surface}.
+
+To compare the dipole and quadrupole approximations to the exact potential, a plane parallel to the $y$-axis was selected and ``cut'' at the location $x = 0.1$ and $z = 0.1$. This plane was of particular interest due to the fact that it passes close to two positive charges at $y \approx \pm 1$, and runs right in the middle of a dipole near $y \approx 0$. Figure \ref{fig:approx} shows the result.
+
+Calculation of the electric field yields the graphs in Figure \ref{fig:field}. Figure \ref{fig:field-2m} shows the complex structure of the electric field for multiple charges, and as one moves away from the charge distribution, the field appears to be that of a dipole, as can be seen in Figure \ref{fig:field-64m}.
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.4\textwidth]{113.png}
+	\caption{Random distribution of charges in the $x$-$y$ plane.}
+	\label{fig:plane}
+\end{figure}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.8\textwidth]{114.png}
+	\caption{3D surface plot of the potential of ten unit point charges in the plane $z = 0.1$.}
+	\label{fig:surface}
+\end{figure}
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.4\textwidth]{115.png}
+	\caption{Contour projection of the potential in Figure \ref{fig:surface} on the $x$-$y$ plane.}
+	\label{fig:contour}
+\end{figure}
+
+
+\begin{figure}[tb]
+	\centering
+	\includegraphics[width=0.8\textwidth]{116.png}
+	\caption{Potentials for different approximations at $x = z = 0.1$.}
+	\label{fig:approx}
+\end{figure}
+
+\begin{figure}[tb]
+    \centering
+	\begin{subfigure}[h!]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{117-2.png}
+		\caption{2 m}
+		\label{fig:field-2m}
+	\end{subfigure}
+	\begin{subfigure}[h!]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{117-8.png}
+		\caption{8 m}
+		\label{fig:field-8m}
+	\end{subfigure}
+	\begin{subfigure}[h!]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{117-16.png}
+		\caption{16 m}
+		\label{fig:field-16m}
+	\end{subfigure}
+	\begin{subfigure}[h!]{0.45\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{117-64.png}
+		\caption{64 m}
+		\label{fig:field-64m}
+	\end{subfigure}
+	\caption{Electric field of ten unit charges viewed at specific distances away from the charge distribution.}
+	\label{fig:field}
+\end{figure}
+
+\clearpage
+
+\bibliographystyle{spp-bst}
+\begin{thebibliography}{1}
+\label{sec:Ref}
+
+\bibitem[Kinzel(1998)]{kinzel}
+Kinzel, W., and G. Reents (1998). Multipole expansion. In M. Clajus, and B. Freeland-Clajus (Trans.), \textit{Physics by computer: programming physical problems using Mathematica and C}, pp. 30-36. New York: Springer (Original work published 1996).
+
+\bibitem[Griffiths(1999)]{griffiths}
+Griffiths, D.J. (1999). Multipole expansion. \textit{Introduction to electrodynamics} (3rd ed.), pp. 146-159. New Jersey: Prentice-Hall.
+
+\bibitem[Wilmott et. al.(1995)]{wilmott}
+Wilmott, P., S. Howison, and J. Dewynne. (1995). \textit{The mathematics of financial derivatives: a student introduction}, p. 137. Cambridge University Press.
+
+\bibitem[Olver(1995)]{olver}
+Olver, P. (2013). \textit{Introduction to partial differential equations}, p. 182. Springer Science \& Business Media.
+
+\bibitem[Hunter(2007)]{matplotlib}
+Hunter, J.D. (2007). Matplotlib: a 2D graphics environment. \textit{Computing in science and engineering \textbf{9}}(3), 90-95.
+
+\bibitem[Gradshteyn and Ryzhik(1994)]{gradshteyn}
+Gradshteyn, I.S., and I.M. Ryzhik. (1994). \textit{Table of integrals, series, and products}. Boston, MA: Academic Press.
+
+\bibitem[Edmonds(1955)]{edmonds}
+Edmonds, A. (1955). \textit{Angular momentum in quantum mechanics}. Princeton University Press.
+
+\bibitem[christian(2015)]{christian}
+christian. (2015, 10 December). Visualizing a vector field with Matplotlib. Retrieved 12 October 2018, from \textit{Learning scientific programming with Python}: \url{https://scipython.com/blog/visualizing-a-vector-field-with-matplotlib/}.
+
+\end{thebibliography}
+
+\end{document}
