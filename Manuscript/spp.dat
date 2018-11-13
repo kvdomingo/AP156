@@ -33,7 +33,7 @@
 \renewcommand\Authsep{}
 \renewcommand\Authands{and }
 \renewcommand\Authfont{\small {\bfseries}}
-\renewcommand\Affilfont{\small	\itshape}
+\renewcommand\Affilfont{\small}
 \setlength{\affilsep}{5pt}
 \makeatother
 \newcommand{\corremail}{\rm Corresponding author:~}
