@@ -14,7 +14,7 @@
 %\usepackage{subfig}
 
 \parindent 0.5cm    % paragraphs indent
-%\topmargin=1in
+\topmargin=-1in
 
 % SPP details
 %\newcommand{\spp}{1\textsuperscript{st}}
